@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+<script>
+  (function(){
+    if(''){
+      if (prompt('请输入文章密码') !== ''){
+        alert('密码错误');
+        window.history.back();
+      }
+    }
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="简单画一些数学分布">
+<meta name="keywords" content="数学,统计学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些数学分布">
+<meta property="og:url" content="http://litowang.top/2017/10/27/math-distribution/index.html">
+<meta property="og:site_name" content="一只热爱物理与算法的汪">
+<meta property="og:description" content="简单画一些数学分布">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-01-31T17:41:56.067Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一些数学分布">
+<meta name="twitter:description" content="简单画一些数学分布">
+
+
+
+
+
+
+  <link rel="canonical" href="http://litowang.top/2017/10/27/math-distribution/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一些数学分布 | 一只热爱物理与算法的汪</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一只热爱物理与算法的汪</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">朋友吐槽日常：你的算法到底准不准，一天天给我推荐的都是些啥玩意儿？</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-主页">
+
+    
+    
+    
+
+    
+
+    <a href="/" rel="section">主页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-标签">
+
+    
+    
+    
+
+    
+
+    <a href="/tags/" rel="section">标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-目录">
+
+    
+    
+    
+
+    
+
+    <a href="/categories/" rel="section">目录</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-存档">
+
+    
+    
+    
+
+    
+
+    <a href="/archives/" rel="section">存档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-关于">
+
+    
+    
+    
+
+    
+
+    <a href="/about/" rel="section">关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://litowang.top/2017/10/27/math-distribution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="汪家升(litowang)">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一只热爱物理与算法的汪">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">一些数学分布
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-10-27 00:06:22" itemprop="dateCreated datePublished" datetime="2017-10-27T00:06:22+08:00">2017-10-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2021-02-01 01:41:56" itemprop="dateModified" datetime="2021-02-01T01:41:56+08:00">2021-02-01</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数学/" itemprop="url" rel="index"><span itemprop="name">数学</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>简单画一些数学分布</p>
+<a id="more"></a>
+<h3 id="【1】基础概念"><a href="#【1】基础概念" class="headerlink" title="【1】基础概念"></a>【1】基础概念</h3><p>随机变量：指“其值随机会而定”的变量，机会表现为试验结果，一个随机试验有许多可能的结果，到底出现哪一个要看机会，即有一定概率。随机变量可以看做试验结果的函数。</p>
+<p>对于随机事件，可以以随机变量来进行描述，如：特定人群中，年收入万元以上的人数比例是多少？<br>我们可以引入一个随机变量$X$：</p>
+<script type="math/tex; mode=display">X=随机抽出一个人其年收入</script><p>$X$是我们关心的随机变量，随机事件年收入万元以上的人数比例可以表示为${X>10000}$，即随机事件是包含在随机变量的表述范畴内。随机事件是一种静态的观点，随机变量是一种动态的观点来研究随机现象。就如同常量和变量一样。<br>概率密度函数<br>在数学中，连续型随机变量的概率密度函数（在不至于混淆时可以简称为密度函数）是一个描述这个随机变量的输出值，在某个确定的取值点附近的可能性的函数，也称为概率分布。如：</p>
+<script type="math/tex; mode=display">
+p_i=P(X=a_i)</script><p>累积分布函数也叫分布函数，是概率密度函数的积分。<br>一些常用的概率分布：<br>二项分布：</p>
+<script type="math/tex; mode=display">
+p_i=b(i;n,p)=(^n_i)(1-p)^{n-i}</script><p>常记为：</p>
+<script type="math/tex; mode=display">
+X\sim{B(n,p)}</script><p>泊松分布：</p>
+<script type="math/tex; mode=display">
+P(X=i)=\frac{e^{-\lambda}\lambda^i}{i!}</script><p>常记为：</p>
+<script type="math/tex; mode=display">
+X\sim{P(\lambda)}</script><p>高斯分布：   </p>
+<script type="math/tex; mode=display">
+f(x)=(\sqrt{2\pi})^{-1}e^{-\frac{(x-\mu)^2}{2\sigma^2}}</script><p>常记为：</p>
+<script type="math/tex; mode=display">
+X\sim{N(\mu,\sigma^2)}</script><p>又名正态分布，概率密度是一个钟型曲线，累积分布呈现中间放大，两端抑制的特性。</p>
+<h3 id="【1】高斯分布"><a href="#【1】高斯分布" class="headerlink" title="【1】高斯分布"></a>【1】高斯分布</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy.stats <span class="keyword">as</span> st</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line">z = np.linspace(<span class="number">-6</span>,<span class="number">6</span>,<span class="number">100</span>)</span><br><span class="line">plt.xlabel(<span class="string">'z'</span>, fontsize=<span class="number">15</span>)</span><br><span class="line">plt.title(<span class="string">'Gaussian Z\sim&#123;N(0,1)&#125;'</span>)</span><br><span class="line">y1=st.norm.pdf(z,<span class="number">0</span>,<span class="number">1</span>)</span><br><span class="line">y2=st.norm.cdf(z,<span class="number">0</span>,<span class="number">1</span>)</span><br><span class="line">plt.plot(z,y1,<span class="string">'r-'</span>,label = <span class="string">'Probability density'</span>)</span><br><span class="line">plt.plot(z,y2,<span class="string">'b-'</span>,label = <span class="string">'Cumulative distribution'</span>)</span><br><span class="line"><span class="comment"># plt.ylim(0,0.3)</span></span><br><span class="line">plt.legend()</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<h3 id="【2】Logistic函数分布"><a href="#【2】Logistic函数分布" class="headerlink" title="【2】Logistic函数分布"></a>【2】Logistic函数分布</h3><p>logistic分布：<br>logistic的概率密度函数和高斯密度函数类似，也是一个钟型的曲线。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy.stats <span class="keyword">as</span> st</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line"><span class="comment"># Define the logistic function</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logistic</span><span class="params">(z)</span>:</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + np.exp(-z))</span><br><span class="line"><span class="comment"># Define the logistic function</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logistic_derivative</span><span class="params">(z)</span>:</span></span><br><span class="line">  <span class="keyword">return</span> logistic(z) * (<span class="number">1</span> - logistic(z))</span><br><span class="line"><span class="comment"># Plot the derivative of the logistic function &amp; the logistic function</span></span><br><span class="line"><span class="comment"># plt.figure(figsize=(10,7))</span></span><br><span class="line">z = np.linspace(<span class="number">-6</span>,<span class="number">6</span>,<span class="number">1000</span>)</span><br><span class="line">plt.plot(z, logistic(z), <span class="string">'b-'</span>,label = <span class="string">'Cumulative distribution'</span>)</span><br><span class="line">plt.plot(z, logistic_derivative(z), <span class="string">'r-'</span>,label = <span class="string">'Probability density'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'$z$'</span>, fontsize=<span class="number">15</span>)</span><br><span class="line">plt.title(<span class="string">'Logistic'</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<h3 id="【3】高斯分布和logistic分布的对比"><a href="#【3】高斯分布和logistic分布的对比" class="headerlink" title="【3】高斯分布和logistic分布的对比"></a>【3】高斯分布和logistic分布的对比</h3><p>高斯概率分布和logistic概率分布类似，当高斯分布方差为$\frac{4}{\sqrt{2\pi}}$左右时，高斯分布逼近logstic概率分布。如果高斯概率分布的方差值继续减小，则对应的高斯累积分布0值附近会更加陡峭，中间放大，两端抑制的功能进一步加强。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">theta = <span class="number">4</span>/(np.sqrt(<span class="number">2</span>*np.pi))</span><br><span class="line"><span class="comment"># theta = 1.59576912161</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logistic_dev</span><span class="params">(x)</span>:</span></span><br><span class="line"><span class="keyword">return</span> np.exp(-x)/(np.square(<span class="number">1</span>+np.exp(-x)))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gaussion_dev</span><span class="params">(x,sigma)</span>:</span></span><br><span class="line"><span class="keyword">return</span> np.exp(-(np.square(x))/(<span class="number">2</span>*(np.square(sigma))))/(np.sqrt(<span class="number">2</span>*np.pi)*sigma)</span><br><span class="line">z = np.linspace(<span class="number">-6</span>,<span class="number">6</span>,<span class="number">1000</span>)</span><br><span class="line">plt.plot(z,logistic_dev(z)-gaussion_dev(z,theta),<span class="string">'r-'</span>,label = <span class="string">'density minus'</span>)</span><br><span class="line">plt.plot(z,logistic_dev(z),<span class="string">'b-'</span>,label = <span class="string">'logistic density'</span>)</span><br><span class="line">plt.plot(z,gaussion_dev(z,theta),<span class="string">'g-'</span>,label = <span class="string">'gaussion density'</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p>logistic函数的概率分布和高斯函数的概率分布都是钟型曲线，当高斯的方差取值小于1.69的时候，高斯概率分布对离群点敏感</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the logistic function</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logistic</span><span class="params">(z)</span>:</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + np.exp(-z))</span><br><span class="line"><span class="comment"># Define the logistic function</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logistic_derivative</span><span class="params">(z)</span>:</span></span><br><span class="line">  <span class="keyword">return</span> logistic(z) * (<span class="number">1</span> - logistic(z))</span><br><span class="line"><span class="comment"># Plot the derivative of the logistic function</span></span><br><span class="line"><span class="comment"># plt.figure(figsize=(400,300))</span></span><br><span class="line">z = np.linspace(<span class="number">-6</span>,<span class="number">6</span>,<span class="number">100</span>)</span><br><span class="line">plt.plot(z, logistic_derivative(z), <span class="string">'r-'</span>,label = <span class="string">'logistic'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'$z$'</span>, fontsize=<span class="number">15</span>)</span><br><span class="line">plt.title(<span class="string">'logistic &amp; Gaussian Probability density'</span>)</span><br><span class="line">y1=st.norm.pdf(z,<span class="number">0</span>,<span class="number">1.59</span>)</span><br><span class="line">y2=st.norm.pdf(z,<span class="number">0</span>,<span class="number">0.69</span>)</span><br><span class="line">y3=st.norm.pdf(z,<span class="number">0</span>,<span class="number">3</span>)</span><br><span class="line">plt.plot(z,y1,<span class="string">'b-'</span>,label = <span class="string">'Gaussion, 0, 1.59'</span>)</span><br><span class="line">plt.plot(z,y2,<span class="string">'g-'</span>,label = <span class="string">'Gaussion, 0, 0.69'</span>)</span><br><span class="line">plt.plot(z,y3,<span class="string">'y-'</span>,label = <span class="string">'Gaussion, 0, 3'</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<h3 id="【4】Beta分布"><a href="#【4】Beta分布" class="headerlink" title="【4】Beta分布"></a>【4】Beta分布</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy.stats <span class="keyword">as</span> st</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line">z = np.arange(<span class="number">0.01</span>,<span class="number">1</span>,<span class="number">0.01</span>)</span><br><span class="line">plt.xlabel(<span class="string">'$z$'</span>, fontsize=<span class="number">15</span>)</span><br><span class="line">plt.title(<span class="string">'Beta'</span>)</span><br><span class="line">y1=st.beta.pdf(z,<span class="number">0.5</span>,<span class="number">0.5</span>)</span><br><span class="line">y2=st.beta.cdf(z,<span class="number">0.5</span>,<span class="number">0.5</span>)</span><br><span class="line">plt.plot(z,y1,<span class="string">'r-'</span>,label = <span class="string">'Probability density'</span>)</span><br><span class="line">plt.plot(z,y2,<span class="string">'b-'</span>,label = <span class="string">'Cumulative distribution'</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+      
+
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"><i class="fa fa-tag"> 数学</i></a>
+          
+            <a href="/tags/统计学/" rel="tag"><i class="fa fa-tag"> 统计学</i></a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/27/bayesian-glance/" rel="next" title="贝叶斯方法初探">
+                <i class="fa fa-chevron-left"></i> 贝叶斯方法初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/11/cross-entropy/" rel="prev" title="交叉熵">
+                交叉熵 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="汪家升(litowang)">
+            
+              <p class="site-author-name" itemprop="name">汪家升(litowang)</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <span class="exturl" data-url="aHR0cDovL2Nhb3hpYW9xaW5nLmdpdGh1Yi5pby8=" title="http://caoxiaoqing.github.io/">芥末丝博客</span>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+              <div class="links-of-blogroll motion-element recent-posts links-of-blogroll-block">
+                <div class="links-of-blogroll-title">
+                  <!-- modify icon to fire by szw -->
+                  <i class="fa fa-history fa-" aria-hidden="true"></i>
+                  近期文章
+                </div>
+                <ul class="links-of-blogroll-list ">
+                  
+                  
+                    <li>
+                      <a href="/2020/03/26/oCPX/" title="计算广告发展历程——从CPC到oCPX" target="_blank">计算广告发展历程——从CPC到oCPX</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2020/03/11/pxxr-model-structure-optimization/" title="点击率预估模型结构优化方向小结" target="_blank">点击率预估模型结构优化方向小结</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2019/06/18/java-simd/" title="Java SIMD 单指令多数据流优化" target="_blank">Java SIMD 单指令多数据流优化</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/07/29/factorization-machine/" title="FM因子分解机系列简介" target="_blank">FM因子分解机系列简介</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/05/11/dc-sgd/" title="基于延迟补偿的异步SGD算法" target="_blank">基于延迟补偿的异步SGD算法</a>
+                    </li>
+                  
+                </ul>
+              </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#【1】基础概念"><span class="nav-text">【1】基础概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【1】高斯分布"><span class="nav-text">【1】高斯分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【2】Logistic函数分布"><span class="nav-text">【2】Logistic函数分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【3】高斯分布和logistic分布的对比"><span class="nav-text">【3】高斯分布和logistic分布的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【4】Beta分布"><span class="nav-text">【4】Beta分布</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">汪家升(litowang)</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+  <div class="theme-info">Theme – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Pisces</span> v6.5.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      访问次数
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64134491";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery_lazyload/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      TeX: {equationNumbers: { autoNumber: "AMS" }}
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.5.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('Copied')
+          else $(this).text('Copy failed')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('Copy')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+  
+
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

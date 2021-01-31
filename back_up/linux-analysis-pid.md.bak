@@ -1,0 +1,37 @@
+---
+title: linux进程分析
+date: 2018-06-07 23:18:18
+categories: 工具
+tags:
+ - linux
+ - 工具
+mathjax: true
+---
+
+
+
+
+
+查看进程pid
+
+pgrep java
+
+查看进程详细信息
+
+ps aux | grep 31280
+
+杀死进程
+
+kill -s 9 31280
+
+查看进程详细运行信息
+
+cat /proc/31280/stat
+
+查看进程占用的cpu核序号（如果重试几次序号一直在变，说明不受cpu待见，进程不能独占cpu核）
+
+awk '{print $39}' /proc/31280/stat
+
+查看机器整体使用情况
+
+top

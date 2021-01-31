@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+<script>
+  (function(){
+    if(''){
+      if (prompt('请输入文章密码') !== ''){
+        alert('密码错误');
+        window.history.back();
+      }
+    }
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="简要介绍一下FM因子分解机及其衍生出的一系列模型">
+<meta name="keywords" content="fm,mf,ffm,fwfm,fwffm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FM因子分解机系列简介">
+<meta property="og:url" content="http://litowang.top/2018/07/29/factorization-machine/index.html">
+<meta property="og:site_name" content="一只热爱物理与算法的汪">
+<meta property="og:description" content="简要介绍一下FM因子分解机及其衍生出的一系列模型">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-01-31T17:41:56.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FM因子分解机系列简介">
+<meta name="twitter:description" content="简要介绍一下FM因子分解机及其衍生出的一系列模型">
+
+
+
+
+
+
+  <link rel="canonical" href="http://litowang.top/2018/07/29/factorization-machine/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>FM因子分解机系列简介 | 一只热爱物理与算法的汪</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一只热爱物理与算法的汪</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">朋友吐槽日常：你的算法到底准不准，一天天给我推荐的都是些啥玩意儿？</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-主页">
+
+    
+    
+    
+
+    
+
+    <a href="/" rel="section">主页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-标签">
+
+    
+    
+    
+
+    
+
+    <a href="/tags/" rel="section">标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-目录">
+
+    
+    
+    
+
+    
+
+    <a href="/categories/" rel="section">目录</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-存档">
+
+    
+    
+    
+
+    
+
+    <a href="/archives/" rel="section">存档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-关于">
+
+    
+    
+    
+
+    
+
+    <a href="/about/" rel="section">关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://litowang.top/2018/07/29/factorization-machine/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="汪家升(litowang)">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一只热爱物理与算法的汪">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">FM因子分解机系列简介
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-07-29 21:05:02" itemprop="dateCreated datePublished" datetime="2018-07-29T21:05:02+08:00">2018-07-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2021-02-01 01:41:56" itemprop="dateModified" datetime="2021-02-01T01:41:56+08:00">2021-02-01</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/算法/" itemprop="url" rel="index"><span itemprop="name">算法</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>简要介绍一下FM因子分解机及其衍生出的一系列模型</p>
+<a id="more"></a>
+<p>包括但不限于FM（factorization machine）、域感知因子分解机FFM（field-aware factorization machine）、域加权因子分解机（Field-weighted factorization machine）、MVM（Multi-view machine）、HFM（holographic factorization machine）。</p>
+<p>在信息流推荐、搜索广告推荐等场景下需要对用户的请求选择合适的广告进行展示，CPC收费模式下媒体平台按点击数收费，媒体平台推荐给用户感兴趣的广告要比推荐一条令用户不感兴趣或感到厌烦的广告获得的点击更多收益更大，因此优化点击率预估模型非常关键。每一条训练数据都是一条向量$\mathbf x$，每条训练数据有$n$个特征，其中某个特征记为$x_{i}$，点击率预估模型旨在寻找一个合适的函数$f(x)$，对于每一个用户-广告pair预测该用户对该广告的点击率，并且返回点击率预估值最高的一个用户-广告pair请求以展示到用户界面。</p>
+<h3 id="【1】逻辑回归模型（LR）"><a href="#【1】逻辑回归模型（LR）" class="headerlink" title="【1】逻辑回归模型（LR）"></a>【1】逻辑回归模型（LR）</h3><p>LR模型：</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i}</script><p>LR模型是一个线性模型，每个特征变量$x<em>{i}$都有一个独立的权重$w</em>{i}$，所有特征的加权组合再加上偏置$w_{0}$就得到了最后的输出，模型复杂度是$O(n)$。</p>
+<p>LR的优点是线性模型，建模简单，模型复杂度低，在大规模稀疏数据下容易训练。但是缺点也显而易见，线性模型无法学习到高维的组合特征。比如点击率预估场景下，$x<em>{1}$表示的是性别、$x</em>{2}$表示的是广告id，如何不做特征交叉，对于所有的性别为女的用户推送的广告都是一样的，但是如果做了特征交叉（比如这里的性别与广告id交叉），那么就能学习到女性对某一个品牌服饰广告的权重(兴趣)，增强模型的个性化。</p>
+<p>特征交叉好是好，但是会带来一个麻烦的问题就是维度爆炸，假设原始有10w维的特征，在特征交叉之后特征维度变成了100亿，如此巨大的特征空间对系统内存、通信、计算都有非常大的压力难以训练，如果不对所有的特征交叉进行建模，只对其中部分特征交叉建模是否可行？答案是肯定的，并且业界对此有个专有名词就是<strong>特征工程</strong>，在LR时代，特征工程最容易提高推荐效果，但是特征交叉的尝试需要试错成本，并且随着特征交叉达到了一定上限之后，试错成本也随着增大，投入产出比愈来愈低。</p>
+<p>既然特征交叉这么有用，人工交叉又愈来愈难，有没有办法能在不过分增大参数空间的前提下让模型自动的学习特征交叉权重？（后面可以看到因子分解机系列模型可以比较有效的解决这个问题）</p>
+<h3 id="【2】Poly-2"><a href="#【2】Poly-2" class="headerlink" title="【2】Poly-2"></a>【2】Poly-2</h3><p>Poly-2模型相比于LR，多了一个二维的特征穷举交叉项，由此模型可以自动学习每一个特征交叉的权重</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=1}^{n}w_{ij}x_{i}x_{j}</script><p>但是该模型存在致命的缺点：</p>
+<ol>
+<li>数据稀疏：在稀疏数据中，一个$x<em>{i}$已经是很小概率了，而$x</em>{i}$和$x_{j}$同时出现的概率更是微乎其微，为每对特征交叉拟合一个独立参数难以收敛。</li>
+<li>参数空间大：参数空间为$O(n^{2})$对内存和机器资源和性能要求太高，在实际业务中无法使用。</li>
+</ol>
+<h3 id="【3】因子分解机模型（FM）"><a href="#【3】因子分解机模型（FM）" class="headerlink" title="【3】因子分解机模型（FM）"></a>【3】因子分解机模型（FM）</h3><p>对于Poly-2中的特征交叉部分，可以看做是一个$n*n$的矩阵，我们可以借用矩阵论中的矩阵分解法将矩阵分解为两个向量的外积。因此模型的复杂度就随着下降了。因子分解机就是借助这一方法对特征交叉矩阵进行分解，从而得到一个能有效降维版本的模型，使得模型参数空间减小，模型训练变得可行。FM因子分解机最早由Steffen Rendle提出，该模型公式如下：</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}</script><p>其中：</p>
+<script type="math/tex; mode=display">
+<\mathbf v_{i},\mathbf v_{j}></script><p>表示的是向量$\mathbf v<em>{i}$ 和向量 $\mathbf v</em>{j}$ 的内积，如果我们直接第式子中的第三项部分进行计算，复杂度是$O(kn^{2})$，简单的对式子进行化简，我们可以得到复杂度更低的计算式$O(kn)$：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}
+&=&\frac{1}{2}\sum_{i=1}^{n}\sum_{j=1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j} - \frac{1}{2}\sum_{i=1}^{n}<\mathbf v_{i},\mathbf v_{i}>x_{i}x_{i}\\
+&=&\frac{1}{2} \left( \sum_{i=1}^{n}\sum_{j=1}^{n}\sum_{f=1}^{k}v_{i,f} \cdot v_{j,f} \cdot x_{i} \cdot x_{j} -\sum_{i=1}^{n}\sum_{f=1}^{k}v_{i,f} \cdot v_{i,f} \cdot x_{i} \cdot x_{i}\right) \\
+&=&\frac{1}{2} \left(   \left( \sum_{i=1}^{n} v_{i,f} \cdot x_{i} \right) \left( \sum_{j=1}^{n} v_{j,f} \cdot x_{j} \right) - \sum_{i=1}^{n} v_{i,f}^{2} \cdot x_{i}^{2} \right) \\
+&=&\frac{1}{2} \left(   \left( \sum_{i=1}^{n} v_{i,f} \cdot x_{i} \right)^{2} - \sum_{i=1}^{n} v_{i,f}^{2} \cdot x_{i}^{2} \right) \\
+\end{eqnarray}</script><p>我们再用一个简单的例子回顾下FM模型，假设我们有三个特征：gender（性别）、weekday（星期几）、city（城市），那么FM模型如下：</p>
+<script type="math/tex; mode=display">
+\hat y_{FM}=w_{0}+\sum_{i=1}^{n}w_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}</script><p>注意，此处省略了$x<em>{i}$，因为在one-hot编码中，激活的$x</em>{i}$就是1，未激活的为0。</p>
+<p>取一条训练数据例子如下：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\hat y_{FM}
+&=&w_{Male}+w_{London}+w_{Tuesday} \\
+&+&<v_{Male},v_{London}>\\
+&+&<v_{London},v_{Tuesday}>\\
+&+&<v_{Male},v_{Tuesday}>\\
+\end{eqnarray}</script><p>参数$v_{Male}$的梯度为：</p>
+<script type="math/tex; mode=display">
+\triangledown_{Male} \hat y_{FM}=v_{London}+v_{Tuesday}</script><p>因此性别特征参数的更新，会在城市和星期两个方向进行，这是在假设年龄和星期之间不独立，存在一定相关性，但是如果性别和星期之间是相互独立的，那么我们希望对于性别特征参数的更新应该与星期正交，FM的这一假设降低了模型的空间，使得特征权重的更新相互耦合（后续我们可以看到，FFM则可以解决这个问题）</p>
+<p>FM相关论文：<br><span class="exturl" data-url="aHR0cHM6Ly93d3cuY3NpZS5udHUuZWR1LnR3L35iOTcwNTMvcGFwZXIvUmVuZGxlMjAxMEZNLnBkZg==" title="https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf">Factorization Machines<i class="fa fa-external-link"></i></span></p>
+<h3 id="【4】神经网络因子分解机（NFM）"><a href="#【4】神经网络因子分解机（NFM）" class="headerlink" title="【4】神经网络因子分解机（NFM）"></a>【4】神经网络因子分解机（NFM）</h3><p>因子分解机由于使用了向量内积输出的是一个标量，难以和深度学习结合起来。但是向量内积可以看做是两步操作即element-wise的hardmard积之后再做一个sum。hardmard积的结果是在向量空间中的每个维度上累积特征交叉的信息，如果去掉sum操作，输出k维的向量，后面可以再接多层FC或者其他结构从而构建一个深度网络。hardmard积输出的向量可以看做特征交叉之后在向量空间中的特征表示，契合神经网络中的representation learning 表示学习的思想。</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+c_{f}= 
+\frac{1}{2} \sum_{F_{1}=1}^{m}\lbrace (\sum_{i\in F_{1}}^{n} v_{iF_{1}f}\cdot x_{i} )^{2} -(\sum_{i\in F_{1}}^{n} v_{iF_{1}f}^{2}\cdot x_{i}^{2}) \rbrace
+\end{eqnarray}</script><p>NFM相关论文：</p>
+<p><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvcGRmLzE3MDguMDUwMjcucGRm" title="https://arxiv.org/pdf/1708.05027.pdf">Neural Factorization Machines for Sparse Predictive Analytics<i class="fa fa-external-link"></i></span></p>
+<h3 id="【5】域感知因子分解机模型（FFM）"><a href="#【5】域感知因子分解机模型（FFM）" class="headerlink" title="【5】域感知因子分解机模型（FFM）"></a>【5】域感知因子分解机模型（FFM）</h3><p>首先来看下FFM模型公式：</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i,F_{j}},\mathbf v_{j,F_{i}}>x_{i}x_{j}</script><p>化简为：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+c_{f}= \sum_{F_{1}=1}^{m}\sum_{F_{2}>F_{1}}^{m}(\sum_{i\in F_{1}}^{n}v_{iF_{2}f} \cdot x_{i})(\sum_{j\in F_{2}}^{n}v_{jF_{1}f} \cdot x_{j})
++\frac{1}{2} \sum_{F_{1}=1}^{m}\lbrace (\sum_{i\in F_{1}}^{n} v_{iF_{1}f}\cdot x_{i} )^{2} -(\sum_{i\in F_{1}}^{n} v_{iF_{1}f}^{2}\cdot x_{i}^{2}) \rbrace
+\end{eqnarray}</script><p>FFM相比FM模型多了一个域的概念，域指的是同一类性质的特征可以被归类到同一个域，比如最简单的2-field case: 广告侧特征作为一个域，用户侧特征作为一个域。或者更细的划分，每个one-hot前的原始特征都作为一个域，比如性别one-hot之后有两个特征，这两个特征都属于同一个域。</p>
+<p>同上继续看这条训练数据的case：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\hat y_{FFM}
+&=&w_{Male}+w_{London}+w_{Tuesday} \\
+&+&<v_{Male,City},v_{London,Gender}> \\
+&+&<v_{London,Weekday},v_{Tuesday,City}> \\
+&+&<v_{Male,Weekday},v_{Tuesday,Gender}> \\
+\end{eqnarray}</script><p>参数$v<em>{Male,F</em>{City}}$的梯度为：</p>
+<script type="math/tex; mode=display">
+\triangledown_{Male,F_{City}} \hat y_{FFM}=v_{London,Gender}</script><p>参数$v<em>{Male,F</em>{Weekday}}$的梯度为：</p>
+<script type="math/tex; mode=display">
+\triangledown_{Male,F_{Weekday}} \hat y_{FFM}=v_{Tuesday,Gender}</script><p>从而实现了特征权重更新的解耦。但是参数空间也因此而增大，变成了$O(nkf)$，$f$是field的维度。</p>
+<p>FFM相关论文：<br><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzE3MDEuMDQwOTk=" title="https://arxiv.org/abs/1701.04099">Field-aware Factorization Machines in a Real-world Online Advertising System<i class="fa fa-external-link"></i></span></p>
+<h3 id="【6】域加权因子分解机（FwFM）"><a href="#【6】域加权因子分解机（FwFM）" class="headerlink" title="【6】域加权因子分解机（FwFM）"></a>【6】域加权因子分解机（FwFM）</h3><p>FFM虽好，但是参数空间是FM的$f$倍，在计算广告点击率预估中，one-hot之后的特征维度就达到了10w维，FM模型对每维one-hot特征都用$k$维的隐向量表示，参数空间达到了$kn$维，假设k是20，则参数空间为200w维，FFM为每个特征对于每个域都学习一个隐向量，假设有40个域，那么参数空间将达到8000w维，学习如此大的参数空间需要非常多的数据、机器资源和时间，在工业界是不可接受的。比如在计算广告点击率预估中通常FFM只分为用户和广告两个域，但是参数空间也加倍了。为了解决这个问题，FwFM被提出来了。</p>
+<p>首先来看看Fw-FM的公式：</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}x_{i}x_{j} <\mathbf v_{i},\mathbf v_{j}>r_{F(I),F(j)}</script><p>相比于FM模型，Fw-FM在特征交叉部分为每个交叉另外乘上了一个域交叉系数因子$r_{F(I),F(j)}$，由于域的个数$k$远小于特征参数$n$（$k &lt;&lt; n$），因此Fw-FM模型的复杂度依旧为$O(kn)$。</p>
+<p>继续用上面的训练数据为例子：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\hat y_{FwFM}
+&=&w_{Male}+w_{London}+w_{Tuesday} \\
+&+&<v_{Male},v_{London}>\cdot r_{Gender,City}\\
+&+&<v_{London},v_{Tuesday}>\cdot r_{City,Weekday}\\
+&+&<v_{Male},v_{Tuesday}>\cdot r_{Gender,Weekday}\\
+\end{eqnarray}</script><p>参数$v_{Male}$的梯度为：</p>
+<script type="math/tex; mode=display">
+\triangledown_{Male} \hat y_{FwFM}=v_{London} \cdot r_{Gender,City} +v_{Tuesday} \cdot r_{Gender,Weekday}</script><p>如果Gender域的特征与Weekday的特征不相关，那么这两个域的权重$r<em>{Gender,Weekday}$就非常小，因此$v</em>{Male}$在梯度更新的时候受到Weekday的特征影响较小，因此保证了Gender域的权重能够在合理的方向上更新，做到了去耦合的作用，并且参数空间相比FFM大幅度减小。</p>
+<p>除此之外Fw-FM还有其他两个变体：</p>
+<p>Fw-FM-FeLV:</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}<\mathbf w_{i} \mathbf v_{i}> x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}x_{i}x_{j} <\mathbf v_{i},\mathbf v_{j}>r_{F(I),F(j)}</script><p>Fw-FM-FiLV:</p>
+<script type="math/tex; mode=display">
+f(x)=w_{0}+\sum_{i=1}^{n}<\mathbf w_{F_{i}} \mathbf v_{i}> x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}x_{i}x_{j} <\mathbf v_{i},\mathbf v_{j}>r_{F(I),F(j)}</script><p>这两个变体都是利用embedding向量$v_{i}$对线性项进行改进，增强泛化性。FM模型存在的另一个缺点就是一阶参数和二阶参数是割裂开学习的，对于同一个特征，却有两种参数需要独立学习，在泛化性上存在缺点，以上这两种改进的都是基于考虑到既然已经学习到了特征的两阶权重向量，何不利用两阶权重向量对一阶权重进行表达，一阶参数和二阶参数统一起来权重更新更为紧凑和高效，实验也证明能增强泛化性。</p>
+<p>Fw系数建模域间特征交叉的思想可以扩展开来，比如FFM模型可以看做是多个FM和MF模型的组合，Fw标量系数可以对各个子模型的输出值做reweight以建模同层layer内各子模型的权重，有点归纳偏置作用于模型融合框架下的思想，从而提升模型效果。</p>
+<p>FwFFM</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+c_{f}= \sum_{F_{1}=1}^{m}\sum_{F_{2}>F_{1}}^{m}(\sum_{i\in F_{1}}^{n}v_{iF_{2}f} \cdot x_{i})(\sum_{j\in F_{2}}^{n}v_{jF_{1}f} \cdot x_{j}) \cdot r_{F1,F2}
++\frac{1}{2}\sum_{F_{1}=1}^{m}\lbrace (\sum_{i\in F_{1}}^{n} v_{iF_{1}f}\cdot x_{i} )^{2} -(\sum_{i\in F_{1}}^{n} v_{iF_{1}f}^{2}\cdot x_{i}^{2}) \rbrace \cdot r_{F1,F1}
+\end{eqnarray}</script><p>FwFM相关论文：<br><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzE4MDYuMDM1MTQ=" title="https://arxiv.org/abs/1806.03514">Field-weighted Factorization Machines for Click-Through Rate Prediction in Display Advertising<i class="fa fa-external-link"></i></span></p>
+<h3 id="【7】张量因子分解机（MVM）"><a href="#【7】张量因子分解机（MVM）" class="headerlink" title="【7】张量因子分解机（MVM）"></a>【7】张量因子分解机（MVM）</h3><p>FM、FFM、Fw-FM模型都只考虑了两阶的特征交叉，更高阶的特征交叉并没有被建模，如果考虑更高阶的特征交叉。FM模型是不能胜任的，比如三阶的FM，模型复杂度太高，在生产环境中无法接受。MVM模型采用了另一种建模方式，通过CP分解的方式，将任意高阶的特征交叉降维成$k$维的张量，因此模型复杂度变成了$O(k(m+d))$，由此高阶的特征交叉训练成为了可能。</p>
+<script type="math/tex; mode=display">
+f(x)=\sum_{i_{1}=1}^{I_{1}+1} \cdot \cdot \cdot \sum_{i_{m}=1}^{I_{m}+1}\left( \prod_{p=1}^{m}z_{i_{p}}^{p}\right)\left(\sum_{f=1}^{k}\prod_{p=1}^{m}a_{i_{p},f}^{p}\right)</script><p>简单化简下：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+f(x)
+&=&\sum_{i_{1}=1}^{I_{1}+1} \cdot \cdot \cdot \sum_{i_{m}=1}^{I_{m}+1}\left(\prod_{p=1}^{m}z_{i_{p}}^{p}\right)\left(\sum_{f=1}^{k}\prod_{p=1}^{m}a_{i_{p},f}^{p}\right) \\
+&=& \sum_{f=1}^{k} \sum_{i_{1}=1}^{I_{1}+1} \cdot \cdot \cdot \sum_{i_{m}=1}^{I_{m}+1} \left(\prod_{p=1}^{m}  z_{i_{p}}^{p} a_{i_{p},f}^{p}\right)\\
+&=&\sum_{f=1}^{k} \left(   \sum_{i_{1}=1}^{I_{1}+1} z_{i_{1}}^{1} a_{i_{1},f}^{1} \right) \cdot \cdot \cdot  \left(   \sum_{i_{m}=1}^{I_{m}+1} z_{i_{m}}^{m} a_{i_{m},f}^{m}\right)\\
+\end{eqnarray}</script><p>反向传播更新式如下：</p>
+<script type="math/tex; mode=display">
+\frac{\partial f(x)}{\partial a_{i_{p},f}^{p} } = z_{i_{p}}^{p}\left(   \sum_{i_{1}=1}^{I_{1}+1} z_{i_{1}}^{1} a_{i_{1},f}^{1} \right)\cdot \cdot\cdot\left(\sum_{i_{m}=1}^{I_{m}+1} z_{i_{m}}^{m} a_{i_{m},f}^{m}   \right)</script><p>可以看出反向传播更新式是一个连乘式，MVM的缺点也在于此，当考虑高阶建模的时候，m非常大，连乘式子很长。相对于FM的连和式，对异常点波动更敏感，对模型的收敛挑战越大，实际生产环境中应用较难。如果只使用两阶的MVM则退化成MF模型。</p>
+<p>MVM相关论文：</p>
+<p><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzE1MDYuMDExMTA=" title="https://arxiv.org/abs/1506.01110">Multi-View Factorization Machines<i class="fa fa-external-link"></i></span></p>
+<h3 id="【8】全息因子分解机（Holographic-factorization-machine）"><a href="#【8】全息因子分解机（Holographic-factorization-machine）" class="headerlink" title="【8】全息因子分解机（Holographic factorization machine）"></a>【8】全息因子分解机（Holographic factorization machine）</h3><p>FM模型引入了一个很重要的概念是将离散的one-hot特征端到端的学习一个embedding向量，从而将高达数十万（加入广告id特征）甚至上亿维（加入用户id特征）的离散特征空间映射到同一个$k$维向量空间中，从而实现了降维，其中$k$是FM模型的隐向量维度。特征表达都在同一个空间中有个很好的特性，即可以采用一些数学上的距离函数来计算两个特征点的距离，FM模型采用的是向量内积来度量两个特征向量之间的距离。但是向量内积也有一些局限性，比如向量内积只考虑了向量之间同维度element-wise的交叉，从而限制了一些表达能力。一个简单的想法是我们是否可以用向量外积来建模向量之间的交叉，但是向量外积存在一个问题是维度爆炸；两个$k$维的向量内积结果是一个标量，而两个$k$维的向量外积结果是一个$k^2$维的矩阵，参数量和计算量都增大了很多，难以在实际业务中使用，为了缓解向量外积的参数爆炸问题，可以对向量外积借助全息降维表示（Holographic reduction representation）对向量外积的结果从$k^2$降维成一个$k$维的向量。全息降维表示还有一些很好的特性，比如降维的过程中可以保留绝大部分矩阵信息、可以近似还原回原矩阵（带一些noise）、有一对逆操作循环卷积和循环相关可以天然适用于反向传播。用循环卷积或者循环相关替代内积我们可以推导出全息FM/MF公式如下：</p>
+<p>（1）全息FM模型（CCOV）：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\vec c 
+&=& \sum_{i=1}^{n}\sum_{j=i+1}^{n} (\vec v_{i} \odot \vec x_{i}) \circledast (\vec v_{j} \odot \vec x_{i})
+\\
+&=& \frac{1}{2} 
+\lbrace 
+\sum_{i=1}^{n}\sum_{j=1}^{n} (\vec v_{i} \odot \vec x_{i}) \circledast (\vec v_{j} \odot \vec x_{i}) - 
+\sum_{i=1}^{n}(\vec v_{i} \odot \vec x_{i}) \circledast (\vec v_{j} \odot \vec x_{i})
+\rbrace
+\\
+&=&\frac{1}{2} 
+\lbrace
+(\sum_{i=1}^{n} \vec v_{i}\odot \vec x_{i} )\circledast (\sum_{i=1}^{n} \vec v_{i}\odot \vec x_{i}) -\sum_{i=1}^{n} (\vec v_{i} \odot \vec x_{i}) \circledast (\vec v_{i} \odot \vec x_{i})
+\rbrace
+\\
+&=&\frac{1}{2} \lbrace
+\xi ^{-1} 
+\lbrack
+\xi(\sum_{i=1}^{n} \vec v_{i} \odot \vec x_{i}) \odot \xi (\sum_{i=1}^{n} \vec v_{i}\odot \vec x_{i}) 
+\rbrack
+-
+\sum_{i=1}^{n} \xi ^{-1}\lbrack \xi(\vec v_{i} \odot \vec x_{i}) \odot \xi(\vec v_{i} \odot \vec x_{i} )\rbrack
+\rbrace
+\end{eqnarray}</script><p>可以看到全息FM模型的计算复杂度稍高，为$O(n<em>k</em>logk)$，比推荐系统中常用的FM模型高了近一个数量级的复杂度。</p>
+<p>（2）全息MF模型（CCOV）：</p>
+<script type="math/tex; mode=display">
+\begin{eqnarray}
+\vec c 
+&=& \sum_{F_{1}=1}^{m}\sum_{F_{2}>F_{1}}^{m} \lbrack (\sum_{i\in F_{1}}^{n} \vec v_{iF_{2}} \odot \vec x_{i}) \circledast  (\sum_{j\in F_{2}}^{n} \vec v_{jF_{1}} \odot \vec x_{j})\rbrack \\
+&=& \sum_{F_{1}=1}^{m}\sum_{F_{2}>F_{1}}^{m} 
+\xi^{-1} \lbrack \xi (\sum_{i\in F_{1}}^{n} \vec v_{iF_{2}} \odot \vec x_{i}) 
+\odot
+\xi(\sum_{j\in F_{2}}^{n} \vec v_{jF_{1}} \odot \vec x_{j})
+\rbrack \\
+\end{eqnarray}</script><p>全息MF模型的计算复杂度为$O(nk)$和传统向量内积版本的FM/MF一样，可以在现网大规模使用。事实上全息降维表示有两种互逆算子，循环卷积（CCOV）和循环相关（CCOR），因此可以同时采用这两种算子从不同角度挖掘特征交互关系，如Dual HMF模型</p>
+<p>HFM相关论文：<span class="exturl" data-url="aHR0cHM6Ly93d3cucmVzZWFyY2hnYXRlLm5ldC9wdWJsaWNhdGlvbi8zMzAxMDE1NTFfSG9sb2dyYXBoaWNfRmFjdG9yaXphdGlvbl9NYWNoaW5lc19mb3JfUmVjb21tZW5kYXRpb24=" title="https://www.researchgate.net/publication/330101551_Holographic_Factorization_Machines_for_Recommendation">Holographic Factorization Machines for Recommendation<i class="fa fa-external-link"></i></span></p>
+<p>总的来说，借鉴SVD的因子分解思想衍生出了FM系列模型仍然在embedding+特征交互函数框架下，二阶特征交互</p>
+<p>不定期更新~</p>
+
+      
+    </div>
+
+    
+      
+
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/fm/" rel="tag"><i class="fa fa-tag"> fm</i></a>
+          
+            <a href="/tags/mf/" rel="tag"><i class="fa fa-tag"> mf</i></a>
+          
+            <a href="/tags/ffm/" rel="tag"><i class="fa fa-tag"> ffm</i></a>
+          
+            <a href="/tags/fwfm/" rel="tag"><i class="fa fa-tag"> fwfm</i></a>
+          
+            <a href="/tags/fwffm/" rel="tag"><i class="fa fa-tag"> fwffm</i></a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/11/dc-sgd/" rel="next" title="基于延迟补偿的异步SGD算法">
+                <i class="fa fa-chevron-left"></i> 基于延迟补偿的异步SGD算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/18/java-simd/" rel="prev" title="Java SIMD 单指令多数据流优化">
+                Java SIMD 单指令多数据流优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="汪家升(litowang)">
+            
+              <p class="site-author-name" itemprop="name">汪家升(litowang)</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <span class="exturl" data-url="aHR0cDovL2Nhb3hpYW9xaW5nLmdpdGh1Yi5pby8=" title="http://caoxiaoqing.github.io/">芥末丝博客</span>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+              <div class="links-of-blogroll motion-element recent-posts links-of-blogroll-block">
+                <div class="links-of-blogroll-title">
+                  <!-- modify icon to fire by szw -->
+                  <i class="fa fa-history fa-" aria-hidden="true"></i>
+                  近期文章
+                </div>
+                <ul class="links-of-blogroll-list ">
+                  
+                  
+                    <li>
+                      <a href="/2020/03/26/oCPX/" title="计算广告发展历程——从CPC到oCPX" target="_blank">计算广告发展历程——从CPC到oCPX</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2020/03/11/pxxr-model-structure-optimization/" title="点击率预估模型结构优化方向小结" target="_blank">点击率预估模型结构优化方向小结</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2019/06/18/java-simd/" title="Java SIMD 单指令多数据流优化" target="_blank">Java SIMD 单指令多数据流优化</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/07/29/factorization-machine/" title="FM因子分解机系列简介" target="_blank">FM因子分解机系列简介</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/05/11/dc-sgd/" title="基于延迟补偿的异步SGD算法" target="_blank">基于延迟补偿的异步SGD算法</a>
+                    </li>
+                  
+                </ul>
+              </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#【1】逻辑回归模型（LR）"><span class="nav-text">【1】逻辑回归模型（LR）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【2】Poly-2"><span class="nav-text">【2】Poly-2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【3】因子分解机模型（FM）"><span class="nav-text">【3】因子分解机模型（FM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【4】神经网络因子分解机（NFM）"><span class="nav-text">【4】神经网络因子分解机（NFM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【5】域感知因子分解机模型（FFM）"><span class="nav-text">【5】域感知因子分解机模型（FFM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【6】域加权因子分解机（FwFM）"><span class="nav-text">【6】域加权因子分解机（FwFM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【7】张量因子分解机（MVM）"><span class="nav-text">【7】张量因子分解机（MVM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【8】全息因子分解机（Holographic-factorization-machine）"><span class="nav-text">【8】全息因子分解机（Holographic factorization machine）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">汪家升(litowang)</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+  <div class="theme-info">Theme – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Pisces</span> v6.5.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      访问次数
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64134491";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery_lazyload/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      TeX: {equationNumbers: { autoNumber: "AMS" }}
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.5.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('Copied')
+          else $(this).text('Copy failed')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('Copy')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+  
+
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

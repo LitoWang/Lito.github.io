@@ -1,0 +1,102 @@
+---
+title: parameter-server
+date: 2018-09-04 22:04:36
+categories: 算法
+tags:
+ - 优化算法
+ - 机器学习
+mathjax: true
+---
+
+
+
+在单机时代（如caffee）模型训练通常是将参数存放在内存中，并且离线的遍历读取训练数据，计算模型预测值与真实值之间的误差error，而后基于sgd等优化算法迭代更新内存中的模型参数，单机模式的缺点也非常明显，只能利用单机的性能，cpu、内存和带宽都是限制大规模模型训练的瓶颈。
+<!--more-->
+
+分布式机器学习框架通过将模型训练拆分到各个独立的worker上，从而降低了对单机性能上限的要求，因此可以很容易的通过扩展worker的并行度以应对大规模模型训练的压力。分布式机器学习框架下，模型训练存在一个需要解决的问题是参数的更新在各worker上是各自独立的，模型参数对于各个worker是局部变量，如何将训练的梯度统一在同一个全局变量的模型参数上进行更新？有两种解决方案:
+
+一种是参数平均法：在每个worker训练n次之后，将各个worker上的模型参数进行汇总平均，然后再广播到各个worker上，继续接收新的训练数据更新各自worker上的参数；周而复始重复这两步步骤。
+
+另一种是参数服务器框架：模型参数统一存放在一个独立的参数服务器中，每个worker接收一批训练数据时先获取需要更新的key，然后根据这些key去参数服务器拉取对应的值，进行前向传播计算误差，反向传播计算梯度，并将对应的梯度值返回给参数服务器更新模型参数。
+
+参数服务器最早由Alex Smola在2010年提出的并行LDA框架中提出来，其采用了开源的Memcached存储模型参数，
+
+的大规模应用中limu博士起到了很关键的作用，总结一下参数服务器的特点：
+
+1. 分布式存储
+2. 高可靠，备份容灾
+3. 高性能
+4. 支持多种优化算法
+
+可见参数服务器和基于内存的k-v存储框架之间存在很多的相似性，因此可以基于开源的分布式k-v存储改造成为分布式参数服务器。
+
+本文以下部分主要介绍基于tair改造的的分布式参数服务器框架。
+
+首先来看看在tair中简单的数据get功能是如何实现的：
+
+tair的运行基于底层的tbnet和tbsysy库
+
+首先在客户端
+
+在分布式通信中，client端是封装给用户使用的接口，本质上并不实现真正的存储功能，而是将请求打包发送给server端，让server端实现具体的功能，然后将返回结果也打包发送给client端解析处理完成用户所要求的功能。
+
+1. 首先检查key和area参数的有效性；
+
+```java
+if(!key_entry_check(key)){
+
+return TAIR_RETURN_ITEMSIZE_ERROR;
+
+}
+
+if(area < 0 || area >= TAIR_MAX_AREA_COUNT){
+
+return TAIR_RETURN_INVALID_ARGUMENT;
+
+}
+```
+
+
+
+1. 利用MurmurHash2哈希算法取得key所在的server list；
+
+```java
+vector<uint64_t> server_list;
+
+if (!get_server_id(key, server_list)) {
+
+TBSYS_LOG(DEBUG, "can not find serverId, return false");
+
+return -1;
+
+}
+
+TBSYS_LOG(DEBUG,"get from server:%s",tbsys::CNetUtil::addrToString(server_list[0]).c_str());
+```
+
+
+
+handlePacketQueue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

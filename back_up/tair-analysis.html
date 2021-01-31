@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+<script>
+  (function(){
+    if(''){
+      if (prompt('请输入文章密码') !== ''){
+        alert('密码错误');
+        window.history.back();
+      }
+    }
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近工作中用到了tair作k-v缓存，简要记录下tair的源码结构和工作原理。">
+<meta name="keywords" content="数学,贝叶斯">
+<meta property="og:type" content="website">
+<meta property="og:title" content="tair服务端源码解析">
+<meta property="og:url" content="http://litowang.top/back_up/tair-analysis.html">
+<meta property="og:site_name" content="一只热爱物理与算法的汪">
+<meta property="og:description" content="最近工作中用到了tair作k-v缓存，简要记录下tair的源码结构和工作原理。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://litowang.top/images/tair_tree.jpg">
+<meta property="og:updated_time" content="2021-01-31T17:41:56.070Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tair服务端源码解析">
+<meta name="twitter:description" content="最近工作中用到了tair作k-v缓存，简要记录下tair的源码结构和工作原理。">
+<meta name="twitter:image" content="http://litowang.top/images/tair_tree.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://litowang.top/back_up/tair-analysis.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>tair服务端源码解析 | 一只热爱物理与算法的汪</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一只热爱物理与算法的汪</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">朋友吐槽日常：你的算法到底准不准，一天天给我推荐的都是些啥玩意儿？</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-主页">
+
+    
+    
+    
+
+    
+
+    <a href="/" rel="section">主页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-标签">
+
+    
+    
+    
+
+    
+
+    <a href="/tags/" rel="section">标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-目录">
+
+    
+    
+    
+
+    
+
+    <a href="/categories/" rel="section">目录</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-存档">
+
+    
+    
+    
+
+    
+
+    <a href="/archives/" rel="section">存档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-关于">
+
+    
+    
+    
+
+    
+
+    <a href="/about/" rel="section">关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+    
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+    
+
+  
+
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+<h2 class="post-title" itemprop="name headline">tair服务端源码解析</h2>
+
+<div class="post-meta">
+  
+  
+
+
+
+</div>
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <p>最近工作中用到了tair作k-v缓存，简要记录下tair的源码结构和工作原理。</p>
+<a id="more"></a>
+<p>首先上tair服务端代码树状图：</p>
+<p><img src="/images/tair_tree.jpg" alt="tair_tree"></p>
+<p>首先分析配置服务器代码：</p>
+<p>main函数在加载配置文件内容到内存，创建工作目录，将本线程设置为后台线程。接着，创建tair::config_server对象，调用start函数，configserver就在完成初始化后，就开始对外提供服务了</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">#tair_cfg_svr.hpp</span><br><span class="line">main(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 读取配置文件</span></span><br><span class="line">  <span class="keyword">char</span> *</span><br><span class="line">    config_file = parse_cmd_line(argc, argv);</span><br><span class="line">  <span class="keyword">if</span>(config_file == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    print_usage(argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 读取配置文件</span></span><br><span class="line">  <span class="keyword">if</span>(TBSYS_CONFIG.load(config_file)) &#123;</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"load file %s error\n"</span>, config_file);</span><br><span class="line">    <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span> *</span><br><span class="line">    sz_pid_file =</span><br><span class="line">    TBSYS_CONFIG.getString(CONFSERVER_SECTION, TAIR_PID_FILE, <span class="string">"cfgsvr.pid"</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span> *</span><br><span class="line">    sz_log_file =</span><br><span class="line">    TBSYS_CONFIG.getString(CONFSERVER_SECTION, TAIR_LOG_FILE, <span class="string">"cfgsvr.log"</span>);</span><br><span class="line">  <span class="keyword">if</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">char</span> *</span><br><span class="line">      p,</span><br><span class="line">      dir_path[<span class="number">256</span>];</span><br><span class="line">    <span class="built_in">sprintf</span>(dir_path, <span class="string">"%s"</span>,</span><br><span class="line">            TBSYS_CONFIG.getString(CONFSERVER_SECTION, TAIR_DATA_DIR,</span><br><span class="line">                                   TAIR_DEFAULT_DATA_DIR));</span><br><span class="line">    <span class="keyword">if</span>(!tbsys::CFileUtil::mkdirs(dir_path)) &#123;</span><br><span class="line">      <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"create dir %s error\n"</span>, dir_path);</span><br><span class="line">      <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">sprintf</span>(dir_path, <span class="string">"%s"</span>, sz_pid_file);</span><br><span class="line">    p = <span class="built_in">strrchr</span>(dir_path, <span class="string">'/'</span>);</span><br><span class="line">    <span class="keyword">if</span>(p != <span class="literal">NULL</span>)</span><br><span class="line">      *p = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="keyword">if</span>(p != <span class="literal">NULL</span> &amp;&amp; !tbsys::CFileUtil::mkdirs(dir_path)) &#123;</span><br><span class="line">      <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"create dir %s error\n"</span>, dir_path);</span><br><span class="line">      <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">sprintf</span>(dir_path, <span class="string">"%s"</span>, sz_log_file);</span><br><span class="line">    p = <span class="built_in">strrchr</span>(dir_path, <span class="string">'/'</span>);</span><br><span class="line">    <span class="keyword">if</span>(p != <span class="literal">NULL</span>)</span><br><span class="line">      *p = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="keyword">if</span>(p != <span class="literal">NULL</span> &amp;&amp; !tbsys::CFileUtil::mkdirs(dir_path)) &#123;</span><br><span class="line">      <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"create dir %s error\n"</span>, dir_path);</span><br><span class="line">      <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span></span><br><span class="line">    pid;</span><br><span class="line">  <span class="keyword">if</span>((pid = tbsys::CProcess::existPid(sz_pid_file))) &#123;</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"program has been exist: pid=%d\n"</span>, pid);</span><br><span class="line">    <span class="keyword">return</span> EXIT_FAILURE;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span> *</span><br><span class="line">    sz_log_level =</span><br><span class="line">    TBSYS_CONFIG.getString(CONFSERVER_SECTION, TAIR_LOG_LEVEL, <span class="string">"info"</span>);</span><br><span class="line">  TBSYS_LOGGER.setLogLevel(sz_log_level);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//设置当前线程为后台线程</span></span><br><span class="line">  <span class="keyword">if</span>(tbsys::CProcess::startDaemon(sz_pid_file, sz_log_file) == <span class="number">0</span>) &#123;</span><br><span class="line">    signal(SIGPIPE, SIG_IGN);</span><br><span class="line">    signal(SIGHUP, SIG_IGN);</span><br><span class="line">    signal(SIGINT, sign_handler);</span><br><span class="line">    signal(SIGTERM, sign_handler);</span><br><span class="line">    signal(<span class="number">40</span>, sign_handler);</span><br><span class="line">    signal(<span class="number">41</span>, sign_handler);</span><br><span class="line">    signal(<span class="number">42</span>, sign_handler);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建tair_config_server对象，调用start函数，启动cs服务</span></span><br><span class="line">    tair_cfg_svr = <span class="keyword">new</span> tair::config_server::tair_config_server();</span><br><span class="line">    tair_cfg_svr-&gt;start();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ignore signal when destroy, cause sig_handler may use tair_cfg_svr between delete and set it to NULL.</span></span><br><span class="line">    signal(SIGINT, SIG_IGN);</span><br><span class="line">    signal(SIGTERM, SIG_IGN);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//删除tair_cfg_svr对象</span></span><br><span class="line">    <span class="keyword">delete</span> tair_cfg_svr;</span><br><span class="line">    tair_cfg_svr = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    log_info(<span class="string">"exit program."</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着我们看看<code>tair_cfg_svr-&gt;start();</code>start函数的实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">#tair_cfg_svr.hpp</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">tair_config_server::start</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">  	  <span class="comment">//执行部分初始化</span></span><br><span class="line">      <span class="keyword">if</span>(initialize()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//process thread</span></span><br><span class="line">  	  <span class="comment">//tbnet::PacketQueueThread task_queue_thread;处理请求，没有请求则等待</span></span><br><span class="line">      task_queue_thread.start();</span><br><span class="line"></span><br><span class="line">      <span class="comment">// ransport</span></span><br><span class="line">      <span class="keyword">char</span> spec[<span class="number">32</span>];</span><br><span class="line">      <span class="keyword">bool</span> ret = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">if</span>(ret) &#123;</span><br><span class="line">        <span class="keyword">int</span> port =</span><br><span class="line">          TBSYS_CONFIG.getInt(CONFSERVER_SECTION, TAIR_PORT,</span><br><span class="line">                              TAIR_CONFIG_SERVER_DEFAULT_PORT);</span><br><span class="line">        port++;                        <span class="comment">// port of heart beat will be plus one</span></span><br><span class="line">        <span class="built_in">sprintf</span>(spec, <span class="string">"tcp::%d"</span>, port);</span><br><span class="line">        <span class="keyword">if</span>(heartbeat_transport.listen(spec, &amp;packet_streamer, <span class="keyword">this</span>) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">          log_error(<span class="string">"listen port %d error"</span>, port);</span><br><span class="line">          ret = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">          log_info(<span class="string">"open tcp port %d"</span>, port);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// tcp</span></span><br><span class="line">      <span class="keyword">if</span>(ret) &#123;</span><br><span class="line">        <span class="keyword">int</span> port =</span><br><span class="line">          TBSYS_CONFIG.getInt(CONFSERVER_SECTION, TAIR_PORT,</span><br><span class="line">                              TAIR_CONFIG_SERVER_DEFAULT_PORT);</span><br><span class="line">        <span class="built_in">sprintf</span>(spec, <span class="string">"tcp::%d"</span>, port);</span><br><span class="line">        <span class="keyword">if</span>(packet_transport.listen(spec, &amp;packet_streamer, <span class="keyword">this</span>) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">          log_error(<span class="string">"listen port %d error"</span>, port);</span><br><span class="line">          ret = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">          log_info(<span class="string">"listen tcp port: %d"</span>, port);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span>(ret) &#123;</span><br><span class="line">        log_info(<span class="string">"---- program stated PID: %d ----"</span>, getpid());</span><br><span class="line">        packet_transport.start();</span><br><span class="line">        heartbeat_transport.start();</span><br><span class="line">        <span class="comment">//my_server_conf_thread线程主要工作是读取group文件配置，下面重点介绍这个线程的功能</span></span><br><span class="line">        my_server_conf_thread.start();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span> &#123;</span><br><span class="line">        stop();</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      task_queue_thread.wait();</span><br><span class="line">      my_server_conf_thread.wait();</span><br><span class="line">      packet_transport.wait();</span><br><span class="line">      heartbeat_transport.wait();</span><br><span class="line"></span><br><span class="line">      destroy();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>my_server_conf_thread线程主要工作是读取group文件配置，下面重点介绍这个线程的功能<br>：该线程的run函数做了如下工作：</p>
+<p>1） 读取配置文件，建立保存group信息的数据结构，这些信息包括该group的数据服务器列表等；</p>
+<p>2） 如果主配置服务器存在并且alive, 备配置服务器从主配置服务器上读取group的配置信息，而不是从配置文件中读取；</p>
+<p>3）建立循环，循环做如下事情：<br>​    a) 检查group的配置文件版本信息，确定是否要重新读取配置文件；<br>​    b) 检查group的对照表，确定是否要重新建立对照表，若需重建，设置重建标志；<br>​    c) 检查配置服务器的状态；<br>​    d) 检查数group的数据服务器的状态；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line">#server_conf_thread.cpp</span><br><span class="line"><span class="comment">// implementaion Runnable interface</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">server_conf_thread::run</span><span class="params">(tbsys::CThread * thread, <span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">uint64_t</span> sync_config_server_id = <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">uint64_t</span> tmp_master_config_server_id = master_config_server_id;</span><br><span class="line">      <span class="keyword">if</span>(tmp_master_config_server_id == util::local_server_ip::ip) &#123;</span><br><span class="line">        tmp_master_config_server_id = get_slave_server_id();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span>(tmp_master_config_server_id)</span><br><span class="line">        sync_config_server_id =</span><br><span class="line">          get_master_config_server(tmp_master_config_server_id, <span class="number">1</span>);</span><br><span class="line">      <span class="keyword">if</span>(sync_config_server_id) &#123;</span><br><span class="line">        log_info(<span class="string">"syncConfigServer: %s"</span>,</span><br><span class="line">                 tbsys::CNetUtil::addrToString(sync_config_server_id).</span><br><span class="line">                 c_str());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// groupFile</span></span><br><span class="line">      <span class="comment">// 读取group文件</span></span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">char</span> *group_file_name =</span><br><span class="line">        TBSYS_CONFIG.getString(CONFSERVER_SECTION, TAIR_GROUP_FILE, <span class="literal">NULL</span>);</span><br><span class="line">      <span class="keyword">if</span>(group_file_name == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        log_error(<span class="string">"not found %s:%s "</span>, CONFSERVER_SECTION, TAIR_GROUP_FILE);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">uint32_t</span> config_version_from_file = get_file_time(group_file_name);</span><br><span class="line">      <span class="comment">//bool rebuild_group = true;</span></span><br><span class="line">      <span class="keyword">bool</span> rebuild_this_group = <span class="literal">false</span>;</span><br><span class="line">      load_group_file(group_file_name, config_version_from_file,</span><br><span class="line">                      sync_config_server_id);</span><br><span class="line">      <span class="comment">//if (syncConfigServer != 0) &#123;</span></span><br><span class="line">      <span class="comment">//    rebuild_group = false;</span></span><br><span class="line">      <span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">//set myself is master</span></span><br><span class="line">      <span class="keyword">if</span>(config_server_info_list.size() == <span class="number">2U</span> &amp;&amp;</span><br><span class="line">         (config_server_info_list[<span class="number">0</span>]-&gt;server_id == util::local_server_ip::ip</span><br><span class="line">          || (sync_config_server_id == <span class="number">0</span></span><br><span class="line">              &amp;&amp; config_server_info_list[<span class="number">1</span>]-&gt;server_id ==</span><br><span class="line">              util::local_server_ip::ip))) &#123;</span><br><span class="line">        master_config_server_id = util::local_server_ip::ip;</span><br><span class="line">        log_info(<span class="string">"set MASTER_CONFIG: %s"</span>,</span><br><span class="line">                 tbsys::CNetUtil::addrToString(master_config_server_id).</span><br><span class="line">                 c_str());</span><br><span class="line">        &#123;</span><br><span class="line">          group_info_map::iterator it;</span><br><span class="line">          group_info_rw_locker.rdlock();</span><br><span class="line">          <span class="keyword">for</span>(it = group_info_map_data.begin();</span><br><span class="line">              it != group_info_map_data.end(); ++it) &#123;</span><br><span class="line">            <span class="keyword">if</span>(rebuild_this_group) &#123;</span><br><span class="line">              it-&gt;second-&gt;set_force_rebuild();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">              <span class="keyword">bool</span> need_build_it = <span class="literal">false</span>;</span><br><span class="line">              <span class="keyword">const</span> <span class="keyword">uint64_t</span> *p_table = it-&gt;second-&gt;get_hash_table();</span><br><span class="line">              <span class="keyword">for</span>(<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; it-&gt;second-&gt;get_server_bucket_count();</span><br><span class="line">                  ++i) &#123;</span><br><span class="line">                <span class="keyword">if</span>(p_table[i] == <span class="number">0</span>) &#123;</span><br><span class="line">                  need_build_it = <span class="literal">true</span>;</span><br><span class="line">                  <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">if</span>(need_build_it) &#123;</span><br><span class="line">                it-&gt;second-&gt;set_force_rebuild();</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">else</span> &#123;</span><br><span class="line">                it-&gt;second-&gt;set_table_builded();</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          group_info_rw_locker.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// will start loop</span></span><br><span class="line">      <span class="keyword">uint32_t</span> loop_count = <span class="number">0</span>;</span><br><span class="line">      tzset();</span><br><span class="line">      <span class="keyword">int</span> log_rotate_time = (time(<span class="literal">NULL</span>) - timezone) % <span class="number">86400</span>;</span><br><span class="line">      <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">tm</span>;</span></span><br><span class="line">      clock_gettime(CLOCK_MONOTONIC, &amp;tm);</span><br><span class="line">      heartbeat_curr_time = tm.tv_sec;</span><br><span class="line">      is_ready = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">while</span>(!_stop) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">tm</span>;</span></span><br><span class="line">        clock_gettime(CLOCK_MONOTONIC, &amp;tm);</span><br><span class="line">        heartbeat_curr_time = tm.tv_sec;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; config_server_info_list.size(); i++) &#123;</span><br><span class="line">          server_info *server_info_it = config_server_info_list[i];</span><br><span class="line">          <span class="keyword">if</span>(server_info_it-&gt;server_id == util::local_server_ip::ip)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">          <span class="keyword">if</span>(server_info_it-&gt;status != server_info::ALIVE</span><br><span class="line">             &amp;&amp; (loop_count % <span class="number">30</span>) != <span class="number">0</span>) &#123;</span><br><span class="line">            down_slave_config_server = server_info_it-&gt;server_id;</span><br><span class="line">            log_debug(<span class="string">"local server: %s set down slave config server: %s"</span>,</span><br><span class="line">                tbsys::CNetUtil::addrToString(util::local_server_ip::ip).c_str(),</span><br><span class="line">                tbsys::CNetUtil::addrToString(down_slave_config_server).c_str());</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          down_slave_config_server = <span class="number">0</span>;</span><br><span class="line">          request_conf_heartbeart *new_packet = <span class="keyword">new</span> request_conf_heartbeart();</span><br><span class="line">          new_packet-&gt;server_id = util::local_server_ip::ip;</span><br><span class="line">          new_packet-&gt;loop_count = loop_count;</span><br><span class="line">          <span class="keyword">if</span>(connmgr_heartbeat-&gt;</span><br><span class="line">             sendPacket(server_info_it-&gt;server_id, new_packet) == <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="keyword">delete</span> new_packet;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        loop_count++;</span><br><span class="line">        <span class="keyword">if</span>(loop_count &lt;= <span class="number">0</span>)</span><br><span class="line">          loop_count = TAIR_SERVER_DOWNTIME + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">uint32_t</span> curver = get_file_time(group_file_name);</span><br><span class="line">        <span class="keyword">if</span>(curver &gt; config_version_from_file) &#123;</span><br><span class="line">          log_info(<span class="string">"groupFile: %s, curver:%d configVersion:%d"</span>,</span><br><span class="line">                   group_file_name, curver, config_version_from_file);</span><br><span class="line">          load_group_file(group_file_name, curver, <span class="number">0</span>);</span><br><span class="line">          config_version_from_file = curver;</span><br><span class="line">          send_group_file_packet();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        check_config_server_status(loop_count);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(loop_count &gt; TAIR_SERVER_DOWNTIME) &#123;</span><br><span class="line">          check_server_status(loop_count);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// rotate log</span></span><br><span class="line">        log_rotate_time++;</span><br><span class="line">        <span class="keyword">if</span>(log_rotate_time % <span class="number">86400</span> == <span class="number">86340</span>) &#123;</span><br><span class="line">          log_info(<span class="string">"rotateLog End"</span>);</span><br><span class="line">          TBSYS_LOGGER.rotateLog(<span class="literal">NULL</span>, <span class="string">"%d"</span>);</span><br><span class="line">          log_info(<span class="string">"rotateLog start"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(log_rotate_time % <span class="number">3600</span> == <span class="number">3000</span>) &#123;</span><br><span class="line">          log_rotate_time = (time(<span class="literal">NULL</span>) - timezone) % <span class="number">86400</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        TAIR_SLEEP(_stop, <span class="number">1</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      is_ready = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>参考文献：</p>
+<ol>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2tlemhvbmdfd3hsL2FydGljbGUvY2F0ZWdvcnkvNzA5MTIyNg==" title="https://blog.csdn.net/kezhong_wxl/article/category/7091226">一个整理很好的tair源码分析博客集<i class="fa fa-external-link"></i></span></li>
+</ol>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+
+
+
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="汪家升(litowang)">
+            
+              <p class="site-author-name" itemprop="name">汪家升(litowang)</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <span class="exturl" data-url="aHR0cDovL2Nhb3hpYW9xaW5nLmdpdGh1Yi5pby8=" title="http://caoxiaoqing.github.io/">芥末丝博客</span>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+              <div class="links-of-blogroll motion-element recent-posts links-of-blogroll-block">
+                <div class="links-of-blogroll-title">
+                  <!-- modify icon to fire by szw -->
+                  <i class="fa fa-history fa-" aria-hidden="true"></i>
+                  近期文章
+                </div>
+                <ul class="links-of-blogroll-list ">
+                  
+                  
+                    <li>
+                      <a href="/2020/03/26/oCPX/" title="计算广告发展历程——从CPC到oCPX" target="_blank">计算广告发展历程——从CPC到oCPX</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2020/03/11/pxxr-model-structure-optimization/" title="点击率预估模型结构优化方向小结" target="_blank">点击率预估模型结构优化方向小结</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2019/06/18/java-simd/" title="Java SIMD 单指令多数据流优化" target="_blank">Java SIMD 单指令多数据流优化</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/07/29/factorization-machine/" title="FM因子分解机系列简介" target="_blank">FM因子分解机系列简介</a>
+                    </li>
+                  
+                    <li>
+                      <a href="/2018/05/11/dc-sgd/" title="基于延迟补偿的异步SGD算法" target="_blank">基于延迟补偿的异步SGD算法</a>
+                    </li>
+                  
+                </ul>
+              </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">汪家升(litowang)</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+  <div class="theme-info">Theme – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Pisces</span> v6.5.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      访问次数
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64134491";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery_lazyload/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      TeX: {equationNumbers: { autoNumber: "AMS" }}
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.5.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('Copied')
+          else $(this).text('Copy failed')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('Copy')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+  
+
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

@@ -1,0 +1,43 @@
+---
+title: meta learning survey 
+date: 2018-09-21 16:24:21
+categories: 算法
+tags:
+ - meta learning
+ - sgd
+ - 机器学习
+mathjax: true
+---
+
+元学习被称为learning to learn。旨在改善当前若机器学习面临的泛化问题。
+
+
+
+首先从一个元学习的网页小工具开始——[Reptile: A Scalable Meta-Learning Algorithm](https://blog.openai.com/reptile/)，[论文地址](https://arxiv.org/pdf/1803.02999.pdf) [代码地址](https://github.com/LitoWang/supervised-reptile)
+
+MAML算法的作者网站，解释什么是learning to learn：[时光传送门](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+参考文献：
+
+1. 一篇整体整理的较好的[文章](https://zhuanlan.zhihu.com/p/28639662)
+2. ​
