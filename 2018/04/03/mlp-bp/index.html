@@ -511,7 +511,7 @@ L=-y \cdot ln(a)-(1-y) \cdot ln(1-a)</script><p>中$a$是模型预测输出值�
 &=&\sum_{j=1}^{s_{l}}\delta_{j}^{l} \cdot  \frac{\partial{z_{j}^{l}}}{\partial{a_{j}^{l-1}}} \cdot \frac{\partial{a_{j}^{l-1}}}{\partial{z_{j}^{l-1}}} \\
 &=&\sum_{j=1}^{s_{l}}\delta_{j}^{l} \cdot w_{ji}^{l-1} \cdot a_{i}^{l-1} \cdot \left( 1- a_{i}^{l-1} \right) \\
 \end{eqnarray}</script><p>其中$s_{j}^{l}$是第$l$层的节点的神经元个数。</p>
-<p>反向传播的关键在于<strong>残差</strong>$\delta<em>{i}^{l}$的反向逐层传递，$\delta</em>{i}^{l}$中$l$表示的是第$l$层网络，$i$表示的是当前节点是该$l$层的第$i$个节点，$\delta_{i}^{l}$表示为该节点的“残差“，由上我们可以由残差的反向传播导出每层每个神经元节点的梯度。</p>
+<p>反向传播的关键在于<strong>残差</strong>$\delta_{i}^{l}$的反向逐层传递，$\delta_{i}^{l}$中$l$表示的是第$l$层网络，$i$表示的是当前节点是该$l$层的第$i$个节点，$\delta_{i}^{l}$表示为该节点的“残差“，由上我们可以由残差的反向传播导出每层每个神经元节点的梯度。</p>
 
       
     </div>
@@ -1035,23 +1035,6 @@ L=-y \cdot ln(a)-(1-y) \cdot ln(1-a)</script><p>中$a$是模型预测输出值�
 
   
 
-  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>

@@ -498,8 +498,8 @@ h(x,\theta)=\pi(\theta|x)m(x)</script><p>其中$m(x)$是边缘概率密度函数
 <p>靠，搞不懂，暂时不写了。。。</p>
 <h2 id="【2】贝叶斯推断"><a href="#【2】贝叶斯推断" class="headerlink" title="【2】贝叶斯推断"></a>【2】贝叶斯推断</h2><p>条件方法<br>后验分布$\pi(\theta|x)$是样本$x$给定下$\theta$的条件分布，基于后验分布的统计推断就意味着只考虑一出现的数据（样本观察值），二认为未出现的数据与推断无关，这一观点称为条件观点，基于此观点提出的统计推断方法称为条件方法。<br>考虑频率学派和贝叶斯学派对参数$\theta$的估计方法的差异性：<br>频率学派认为参数$\theta$的无偏估计$\widetilde\theta(x)$为：</p>
 <script type="math/tex; mode=display">
-E\widetilde\theta(x)=\int_x{\widetilde\theta(x)p(x|\theta)}dx=\theta</script><p>该平均是对样本空间总的所有可能出现的样本求的，但是实际中样本空间中绝大多数的样本尚未出现过，甚至重复数百次也不会出现的样本也要在评价估计量$\widetilde\theta$的好坏中占据一席之地，这是难以理解的。<br>贝叶斯学派的统计推断中不采用无偏性，采用后验概率对参数$\widetilde\theta$进行估计，常用的贝叶斯估计有三种：<br>最大后验估计$\theta<em>{MD}$：是后验分布的众数值对应的$\theta$值，即使得后验分布达到最大值的参数$\theta$。<br>后验中位数估计$\theta</em>{Me}$：指后验分布的中位数对应的参数值。<br>后验期望估计${\theta_E}$：指后验分布的期望值。</p>
-<p>当后验分布是对称的时候，这三种估计重合。<br>值得注意的是：<br>•    在二项分布场合，$\theta$的后验你估计就是经典统计中的极大似然估计。<br>•    $\theta$的后验期望估计${\theta<em>E}$要比最大后验估计$\theta</em>{MD}$更合适一些（小样本下后验期望估计比最大后验估计更能反应置信度上的差别）。<br>贝叶斯估计的误差<br>设参数$\theta$的后验分布$\pi(\theta|x)$，贝叶斯估计为$\widetilde\theta$，则$(\theta-\widetilde\theta)^2$的后验期望：</p>
+E\widetilde\theta(x)=\int_x{\widetilde\theta(x)p(x|\theta)}dx=\theta</script><p>该平均是对样本空间总的所有可能出现的样本求的，但是实际中样本空间中绝大多数的样本尚未出现过，甚至重复数百次也不会出现的样本也要在评价估计量$\widetilde\theta$的好坏中占据一席之地，这是难以理解的。<br>贝叶斯学派的统计推断中不采用无偏性，采用后验概率对参数$\widetilde\theta$进行估计，常用的贝叶斯估计有三种：<br>最大后验估计$\theta_{MD}$：是后验分布的众数值对应的$\theta$值，即使得后验分布达到最大值的参数$\theta$。<br>后验中位数估计$\theta_{Me}$：指后验分布的中位数对应的参数值。<br>后验期望估计${\theta_E}$：指后验分布的期望值。</p>
+<p>当后验分布是对称的时候，这三种估计重合。<br>值得注意的是：<br>•    在二项分布场合，$\theta$的后验你估计就是经典统计中的极大似然估计。<br>•    $\theta$的后验期望估计${\theta_E}$要比最大后验估计$\theta_{MD}$更合适一些（小样本下后验期望估计比最大后验估计更能反应置信度上的差别）。<br>贝叶斯估计的误差<br>设参数$\theta$的后验分布$\pi(\theta|x)$，贝叶斯估计为$\widetilde\theta$，则$(\theta-\widetilde\theta)^2$的后验期望：</p>
 <script type="math/tex; mode=display">
 MSE(\widetilde\theta|x)=E^{\theta|x}(\theta-\widetilde\theta)^2)</script><p>称为$\widetilde\theta$的后验均方差，其平方根称为$\widetilde\theta$的后验标准差，当$\widetilde\theta$为$\theta$的后验期望$\widetilde\theta_E=E(\theta|x)$时，</p>
 <script type="math/tex; mode=display">
@@ -1057,23 +1057,6 @@ MSE(\widetilde\theta_E|x)=Var(\theta|x)+(\widetilde\theta_E-\widetilde\theta)</s
 
   
 
-  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>

@@ -485,7 +485,7 @@
 <a id="more"></a>
 <h3 id="【1】DC-ASGD"><a href="#【1】DC-ASGD" class="headerlink" title="【1】DC-ASGD"></a>【1】DC-ASGD</h3><p>首先让我们来看一看异步SGD是怎么更新参数的</p>
 <p><img src="dc-sgd/images/ASGD.png" alt="dc-sgd"></p>
-<p>可见 $worker<em>{m}$ 从ps拉取的参数是 $w</em>{t}$ ，经过模型训练得到梯度 $g<em>{t}$ ，回传给ps的时候由于其他worker已经更新了参数，此时ps中参数$w$已经变成了$w</em>{t+\tau}$，回传的梯度$g <em>{t}$相比于参数$w</em>{t+\tau}$有了时间$\tau$的梯度延迟。在并行度较高的时候梯度延迟会导致较为严重的精度损失，模型收敛不如单线程更新。为解决异步梯度更新的问题，这篇论文采用了对当前梯度进行补偿的方法，旨在提升异步更新的模型收敛精度。</p>
+<p>可见 $worker_{m}$ 从ps拉取的参数是 $w_{t}$ ，经过模型训练得到梯度 $g_{t}$ ，回传给ps的时候由于其他worker已经更新了参数，此时ps中参数$w$已经变成了$w_{t+\tau}$，回传的梯度$g _{t}$相比于参数$w_{t+\tau}$有了时间$\tau$的梯度延迟。在并行度较高的时候梯度延迟会导致较为严重的精度损失，模型收敛不如单线程更新。为解决异步梯度更新的问题，这篇论文采用了对当前梯度进行补偿的方法，旨在提升异步更新的模型收敛精度。</p>
 <p>该论文借鉴了<span class="exturl" data-url="aHR0cHM6Ly9zaXRlcy5tYXRoLndhc2hpbmd0b24uZWR1L35mb2xsYW5kL01hdGg0MjUvdGF5bG9yMi5wZGY=" title="https://sites.math.washington.edu/~folland/Math425/taylor2.pdf">Folland, 2005<i class="fa fa-external-link"></i></span>将梯度 $g(\mathrm w_{t+\tau})$ 用泰勒展开成</p>
 <script type="math/tex; mode=display">
 g(\mathrm w_{t+\tau})=g(\mathrm w_{t})+\nabla g(\mathrm w_{t})(\mathrm w_{t+\tau}-\mathrm w_{t})</script><p>但是由于梯度的一阶微分对应的是原始损失函数$f$的二阶微分，这意味着必须要先计算Hessian矩阵，而Hessian矩阵的计算是非常耗时，尤其是变量维数较高的时候，有限的计算资源下几乎无法完成。因此作者采用一种近似公式替Hessian，最后得到参数向量$\mathrm w$的梯度更新式：</p>
@@ -495,20 +495,20 @@ g(\mathrm w_{t+\tau})=g(\mathrm w_{t})+\lambda_{t} \cdot g(\mathrm w_{t}) \odot 
 g(w_{t+\tau})=g( w_{t})+\lambda_{t} \cdot g(w_{t})\cdot g(w_{t}) \cdot (w_{t+\tau}-w_{t})</script><p>其中：</p>
 <script type="math/tex; mode=display">
 s_{t}  = d \cdot s_{t-1} + (1-d) \cdot g(w_{t})</script><script type="math/tex; mode=display">
-\lambda_{t} = \frac{\lambda_{0}}{\sqrt{s_{t} + \epsilon}}</script><p>注：$\epsilon$ 是一个很小的值，初始值避免除0；$\lambda <em>{0}$ 是超参，控制补偿的程度；$d$是衰减因子moving average步长； $s</em>{t}$ 是历史moving average衰减的梯度平方和。</p>
+\lambda_{t} = \frac{\lambda_{0}}{\sqrt{s_{t} + \epsilon}}</script><p>注：$\epsilon$ 是一个很小的值，初始值避免除0；$\lambda _{0}$ 是超参，控制补偿的程度；$d$是衰减因子moving average步长； $s_{t}$ 是历史moving average衰减的梯度平方和。</p>
 <p>因此ps端参数更新式为：</p>
 <script type="math/tex; mode=display">
 w_{t+\tau + 1} = w_{t+\tau} - \mu (\lambda_{t} \cdot g(w_{t})\cdot g(w_{t}) \cdot (w_{t+\tau}-w_{t}))</script><p>算法伪代码如下：</p>
 <p><img src="dc-sgd/images/algorithm.png" alt="原始算法伪代码"></p>
 <p>分为两部分ps端和worker端</p>
 <p>worker端和普通基于ps的并行更新没有不同，ps端的运行机制分两种情况处理如下所示：</p>
-<p>第一种是 $worker(m)$  来拉取参数pull request，这时需要将当前的参数 $w<em>{t}$ 保存起来$w</em>{bak}(m)$ </p>
-<p>第二种情况是worker(m)回传梯度$g<em>{t}$，此时梯度将被补偿修正，然后用补偿修正后的梯度更新参数$w</em>{t+\tau}$</p>
-<p>此种方法需要在ps端多存储$m+1$个参数：1. 历史moving average衰减的二阶梯度和 $s<em>{t}$ ，2.各个worker对应的备份参数 $w</em>{bak}(m)$ ，通常情况下这个额外的存储空间是可以接受的。</p>
+<p>第一种是 $worker(m)$  来拉取参数pull request，这时需要将当前的参数 $w_{t}$ 保存起来$w_{bak}(m)$ </p>
+<p>第二种情况是worker(m)回传梯度$g_{t}$，此时梯度将被补偿修正，然后用补偿修正后的梯度更新参数$w_{t+\tau}$</p>
+<p>此种方法需要在ps端多存储$m+1$个参数：1. 历史moving average衰减的二阶梯度和 $s_{t}$ ，2.各个worker对应的备份参数 $w_{bak}(m)$ ，通常情况下这个额外的存储空间是可以接受的。</p>
 <h3 id="【2】改进版本"><a href="#【2】改进版本" class="headerlink" title="【2】改进版本"></a>【2】改进版本</h3><p>但是该实现方法有一点缺陷，通常worker的数量是动态调整的，假如实时数据量大涨，此时需要加大并行度这样一来ps端的 $w_{bak}(m)$ 的个数也需要动态增加，由于通常ps和worker是基于不同框架，逻辑修改较为繁琐。因此笔者对原来的算法稍加修改以最小限度的修改支持该算法。</p>
 <p>修改后的算法伪代码如下：</p>
 <p><img src="dc-sgd/images/algorithm_improve.png" alt="改进算法伪代码"></p>
-<p>改进版的ps不再为每个worker保存一份历史参数 $w<em>{bak}$ ，而是每次 worker 回传的时候随着梯度$g</em>{t}$ 的回传也将 $w_{t}$ 回传给ps，改动之后，适当增加了通信的开销，但是存储的空间花销降低了，且易于实现。</p>
+<p>改进版的ps不再为每个worker保存一份历史参数 $w_{bak}$ ，而是每次 worker 回传的时候随着梯度$g_{t}$ 的回传也将 $w_{t}$ 回传给ps，改动之后，适当增加了通信的开销，但是存储的空间花销降低了，且易于实现。</p>
 <p>参考文献：</p>
 <ol>
 <li><span class="exturl" data-url="aHR0cHM6Ly92aW1lby5jb20vMjM4MjIyMTU4" title="https://vimeo.com/238222158">文章作者talk视频<i class="fa fa-external-link"></i></span></li>
@@ -1062,23 +1062,6 @@ w_{t+\tau + 1} = w_{t+\tau} - \mu (\lambda_{t} \cdot g(w_{t})\cdot g(w_{t}) \cdo
 
   
 
-  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>

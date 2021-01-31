@@ -483,22 +483,22 @@
 <p>在信息流推荐、搜索广告推荐等场景下需要对用户的请求选择合适的广告进行展示，CPC收费模式下媒体平台按点击数收费，媒体平台推荐给用户感兴趣的广告要比推荐一条令用户不感兴趣或感到厌烦的广告获得的点击更多收益更大，因此优化点击率预估模型非常关键。每一条训练数据都是一条向量$\mathbf x$，每条训练数据有$n$个特征，其中某个特征记为$x_{i}$，点击率预估模型旨在寻找一个合适的函数$f(x)$，对于每一个用户-广告pair预测该用户对该广告的点击率，并且返回点击率预估值最高的一个用户-广告pair请求以展示到用户界面。</p>
 <h3 id="【1】逻辑回归模型（LR）"><a href="#【1】逻辑回归模型（LR）" class="headerlink" title="【1】逻辑回归模型（LR）"></a>【1】逻辑回归模型（LR）</h3><p>LR模型：</p>
 <script type="math/tex; mode=display">
-f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i}</script><p>LR模型是一个线性模型，每个特征变量$x<em>{i}$都有一个独立的权重$w</em>{i}$，所有特征的加权组合再加上偏置$w_{0}$就得到了最后的输出，模型复杂度是$O(n)$。</p>
-<p>LR的优点是线性模型，建模简单，模型复杂度低，在大规模稀疏数据下容易训练。但是缺点也显而易见，线性模型无法学习到高维的组合特征。比如点击率预估场景下，$x<em>{1}$表示的是性别、$x</em>{2}$表示的是广告id，如何不做特征交叉，对于所有的性别为女的用户推送的广告都是一样的，但是如果做了特征交叉（比如这里的性别与广告id交叉），那么就能学习到女性对某一个品牌服饰广告的权重(兴趣)，增强模型的个性化。</p>
+f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i}</script><p>LR模型是一个线性模型，每个特征变量$x_{i}$都有一个独立的权重$w_{i}$，所有特征的加权组合再加上偏置$w_{0}$就得到了最后的输出，模型复杂度是$O(n)$。</p>
+<p>LR的优点是线性模型，建模简单，模型复杂度低，在大规模稀疏数据下容易训练。但是缺点也显而易见，线性模型无法学习到高维的组合特征。比如点击率预估场景下，$x_{1}$表示的是性别、$x_{2}$表示的是广告id，如何不做特征交叉，对于所有的性别为女的用户推送的广告都是一样的，但是如果做了特征交叉（比如这里的性别与广告id交叉），那么就能学习到女性对某一个品牌服饰广告的权重(兴趣)，增强模型的个性化。</p>
 <p>特征交叉好是好，但是会带来一个麻烦的问题就是维度爆炸，假设原始有10w维的特征，在特征交叉之后特征维度变成了100亿，如此巨大的特征空间对系统内存、通信、计算都有非常大的压力难以训练，如果不对所有的特征交叉进行建模，只对其中部分特征交叉建模是否可行？答案是肯定的，并且业界对此有个专有名词就是<strong>特征工程</strong>，在LR时代，特征工程最容易提高推荐效果，但是特征交叉的尝试需要试错成本，并且随着特征交叉达到了一定上限之后，试错成本也随着增大，投入产出比愈来愈低。</p>
 <p>既然特征交叉这么有用，人工交叉又愈来愈难，有没有办法能在不过分增大参数空间的前提下让模型自动的学习特征交叉权重？（后面可以看到因子分解机系列模型可以比较有效的解决这个问题）</p>
 <h3 id="【2】Poly-2"><a href="#【2】Poly-2" class="headerlink" title="【2】Poly-2"></a>【2】Poly-2</h3><p>Poly-2模型相比于LR，多了一个二维的特征穷举交叉项，由此模型可以自动学习每一个特征交叉的权重</p>
 <script type="math/tex; mode=display">
 f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=1}^{n}w_{ij}x_{i}x_{j}</script><p>但是该模型存在致命的缺点：</p>
 <ol>
-<li>数据稀疏：在稀疏数据中，一个$x<em>{i}$已经是很小概率了，而$x</em>{i}$和$x_{j}$同时出现的概率更是微乎其微，为每对特征交叉拟合一个独立参数难以收敛。</li>
+<li>数据稀疏：在稀疏数据中，一个$x_{i}$已经是很小概率了，而$x_{i}$和$x_{j}$同时出现的概率更是微乎其微，为每对特征交叉拟合一个独立参数难以收敛。</li>
 <li>参数空间大：参数空间为$O(n^{2})$对内存和机器资源和性能要求太高，在实际业务中无法使用。</li>
 </ol>
 <h3 id="【3】因子分解机模型（FM）"><a href="#【3】因子分解机模型（FM）" class="headerlink" title="【3】因子分解机模型（FM）"></a>【3】因子分解机模型（FM）</h3><p>对于Poly-2中的特征交叉部分，可以看做是一个$n*n$的矩阵，我们可以借用矩阵论中的矩阵分解法将矩阵分解为两个向量的外积。因此模型的复杂度就随着下降了。因子分解机就是借助这一方法对特征交叉矩阵进行分解，从而得到一个能有效降维版本的模型，使得模型参数空间减小，模型训练变得可行。FM因子分解机最早由Steffen Rendle提出，该模型公式如下：</p>
 <script type="math/tex; mode=display">
 f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}</script><p>其中：</p>
 <script type="math/tex; mode=display">
-<\mathbf v_{i},\mathbf v_{j}></script><p>表示的是向量$\mathbf v<em>{i}$ 和向量 $\mathbf v</em>{j}$ 的内积，如果我们直接第式子中的第三项部分进行计算，复杂度是$O(kn^{2})$，简单的对式子进行化简，我们可以得到复杂度更低的计算式$O(kn)$：</p>
+<\mathbf v_{i},\mathbf v_{j}></script><p>表示的是向量$\mathbf v_{i}$ 和向量 $\mathbf v_{j}$ 的内积，如果我们直接第式子中的第三项部分进行计算，复杂度是$O(kn^{2})$，简单的对式子进行化简，我们可以得到复杂度更低的计算式$O(kn)$：</p>
 <script type="math/tex; mode=display">
 \begin{eqnarray}
 \sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}
@@ -508,7 +508,7 @@ f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i
 &=&\frac{1}{2} \left(   \left( \sum_{i=1}^{n} v_{i,f} \cdot x_{i} \right)^{2} - \sum_{i=1}^{n} v_{i,f}^{2} \cdot x_{i}^{2} \right) \\
 \end{eqnarray}</script><p>我们再用一个简单的例子回顾下FM模型，假设我们有三个特征：gender（性别）、weekday（星期几）、city（城市），那么FM模型如下：</p>
 <script type="math/tex; mode=display">
-\hat y_{FM}=w_{0}+\sum_{i=1}^{n}w_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}</script><p>注意，此处省略了$x<em>{i}$，因为在one-hot编码中，激活的$x</em>{i}$就是1，未激活的为0。</p>
+\hat y_{FM}=w_{0}+\sum_{i=1}^{n}w_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}<\mathbf v_{i},\mathbf v_{j}>x_{i}x_{j}</script><p>注意，此处省略了$x_{i}$，因为在one-hot编码中，激活的$x_{i}$就是1，未激活的为0。</p>
 <p>取一条训练数据例子如下：</p>
 <script type="math/tex; mode=display">
 \begin{eqnarray}
@@ -544,9 +544,9 @@ c_{f}= \sum_{F_{1}=1}^{m}\sum_{F_{2}>F_{1}}^{m}(\sum_{i\in F_{1}}^{n}v_{iF_{2}f}
 &+&<v_{Male,City},v_{London,Gender}> \\
 &+&<v_{London,Weekday},v_{Tuesday,City}> \\
 &+&<v_{Male,Weekday},v_{Tuesday,Gender}> \\
-\end{eqnarray}</script><p>参数$v<em>{Male,F</em>{City}}$的梯度为：</p>
+\end{eqnarray}</script><p>参数$v_{Male,F_{City}}$的梯度为：</p>
 <script type="math/tex; mode=display">
-\triangledown_{Male,F_{City}} \hat y_{FFM}=v_{London,Gender}</script><p>参数$v<em>{Male,F</em>{Weekday}}$的梯度为：</p>
+\triangledown_{Male,F_{City}} \hat y_{FFM}=v_{London,Gender}</script><p>参数$v_{Male,F_{Weekday}}$的梯度为：</p>
 <script type="math/tex; mode=display">
 \triangledown_{Male,F_{Weekday}} \hat y_{FFM}=v_{Tuesday,Gender}</script><p>从而实现了特征权重更新的解耦。但是参数空间也因此而增大，变成了$O(nkf)$，$f$是field的维度。</p>
 <p>FFM相关论文：<br><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzE3MDEuMDQwOTk=" title="https://arxiv.org/abs/1701.04099">Field-aware Factorization Machines in a Real-world Online Advertising System<i class="fa fa-external-link"></i></span></p>
@@ -564,7 +564,7 @@ f(x)=w_{0}+\sum_{i=1}^{n}w_{i}x_{i} +\sum_{i=1}^{n}\sum_{j=i+1}^{n}x_{i}x_{j} <\
 &+&<v_{Male},v_{Tuesday}>\cdot r_{Gender,Weekday}\\
 \end{eqnarray}</script><p>参数$v_{Male}$的梯度为：</p>
 <script type="math/tex; mode=display">
-\triangledown_{Male} \hat y_{FwFM}=v_{London} \cdot r_{Gender,City} +v_{Tuesday} \cdot r_{Gender,Weekday}</script><p>如果Gender域的特征与Weekday的特征不相关，那么这两个域的权重$r<em>{Gender,Weekday}$就非常小，因此$v</em>{Male}$在梯度更新的时候受到Weekday的特征影响较小，因此保证了Gender域的权重能够在合理的方向上更新，做到了去耦合的作用，并且参数空间相比FFM大幅度减小。</p>
+\triangledown_{Male} \hat y_{FwFM}=v_{London} \cdot r_{Gender,City} +v_{Tuesday} \cdot r_{Gender,Weekday}</script><p>如果Gender域的特征与Weekday的特征不相关，那么这两个域的权重$r_{Gender,Weekday}$就非常小，因此$v_{Male}$在梯度更新的时候受到Weekday的特征影响较小，因此保证了Gender域的权重能够在合理的方向上更新，做到了去耦合的作用，并且参数空间相比FFM大幅度减小。</p>
 <p>除此之外Fw-FM还有其他两个变体：</p>
 <p>Fw-FM-FeLV:</p>
 <script type="math/tex; mode=display">
@@ -1185,23 +1185,6 @@ f(x)
 
   
 
-  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/love.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>
